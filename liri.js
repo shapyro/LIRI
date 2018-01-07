@@ -1,10 +1,10 @@
 require("dotenv").config();
-var Spotify = require("spotify");
+var Spotify = require("node-spotify-api");
 var Twitter = require("twitter");
 
 var keys = require("./keys.js");
 
-var song = new Spotify(keys.spotify);
+var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
 
 var command = process.argv[2];
@@ -44,7 +44,7 @@ function getTwitter(){
 
 function getSpotify(){
   console.log("spotify");
-  song.request('https://api.spotify.com/v1/tracks/7yCPwWs66K8Ba5lFuU2bcx')
+  spotify.request('https://api.spotify.com/v1/tracks/7yCPwWs66K8Ba5lFuU2bcx')
   .then(function(data) {
     console.log(data); 
   })
