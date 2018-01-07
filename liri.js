@@ -8,6 +8,7 @@ var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
 
 var command = process.argv[2];
+var songName = process.argv[3];
 
 switch (command) {
   case "my-tweets":
@@ -44,11 +45,37 @@ function getTwitter(){
 
 function getSpotify(){
   console.log("spotify");
-  spotify.request('https://api.spotify.com/v1/tracks/7yCPwWs66K8Ba5lFuU2bcx')
-  .then(function(data) {
-    console.log(data); 
-  })
-  .catch(function(err) {
-    console.error('Error occurred: ' + err); 
+
+  spotify.search({ type: 'track', query: songName }, function(err, data) {
+    if (err) {
+      return console.log('Error occurred: ' + err);
+    } 
+   
+  var info = data.tracks.items;
+  // console.log(info);
+   
+  for (item of info){
+    // console.log(item);
+    console.log("ALBUM = " + item.album.name);
+    
+    var artists = item.album.artists;
+    for (artist of artists) {
+      console.log("artist =  " + artist.name);
+    }
+  }
+  // console.log(info.album);
+  // console.log(data.tracks.items.album);
+  // console.log(data.tracks.items.artists);
+  // for (var item of data) {
+  //   console.log(item);
+  // }
   });
+
+  // spotify.request('https://api.spotify.com/v1/tracks/7yCPwWs66K8Ba5lFuU2bcx')
+  // .then(function(data) {
+  //   console.log(data); 
+  // })
+  // .catch(function(err) {
+  //   console.error('Error occurred: ' + err); 
+  // });
 }
