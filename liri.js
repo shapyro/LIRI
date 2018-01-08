@@ -8,8 +8,16 @@ var fs = require("fs");
 var spotify = new Spotify(keys.spotify);
 var client = new Twitter(keys.twitter);
 
-var command = process.argv[2];
+var command = "";
+var songName = "";
+var movieName = "";
 
+//  in case I need command later for a future feature
+if (process.argv[2]) {
+  command = process.argv[2];
+}
+
+//  execute command
 switch (command) {
   case "my-tweets":
     getTwitter();
@@ -28,6 +36,7 @@ switch (command) {
     console.log("not an option");
 }
 
+//  get Twitter data
 function getTwitter(){
   var params = {screen_name: 'shapyro1'};
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
@@ -42,9 +51,8 @@ function getTwitter(){
   });
 }
 
+//  getSpotify data
 function getSpotify(){
-
-  var songName = "";
 
   if (!process.argv[3]){
     songName = "The Sign";
@@ -52,10 +60,9 @@ function getSpotify(){
     for (var i = 3; i < process.argv.length; i++){
       songName += " " + process.argv[i];
     }
-    // console.log(songName.trim());
   }
 
-  spotify.search({ type: 'track', query: songName }, function(err, data) {
+  spotify.search({ type: 'track', query: songName.trim() }, function(err, data) {
     if (err) {
       return console.log('Error occurred: ' + err);
     } 
@@ -91,8 +98,8 @@ function getSpotify(){
   // });
 }
 
+//  get Movie data
 function getMovie(){
-  var movieName = "";
 
   if (!process.argv[3]){
     movieName = "Mr. Nobody";
@@ -107,21 +114,20 @@ function getMovie(){
 
   request(queryUrl, function(error, response, body) {
 
-  if (!error && response.statusCode === 200) {
-    console.log(JSON.parse(body));
-    console.log(JSON.parse(body).Title);
-    console.log(JSON.parse(body).Year);
-    console.log(JSON.parse(body).Ratings[0]);
-    console.log(JSON.parse(body).Ratings[1]);
-    console.log(JSON.parse(body).Country);
-    console.log(JSON.parse(body).Language);
-    console.log(JSON.parse(body).Plot);
-    console.log(JSON.parse(body).Actors);
-    // console.log("The movie's rating is: " + JSON.parse(body).year);
-  } else {
-    console.log("Error occured: " + error);
-  }
-});
+    if (!error && response.statusCode === 200) {
+        console.log(JSON.parse(body));
+        console.log(JSON.parse(body).Title);
+        console.log(JSON.parse(body).Year);
+        console.log(JSON.parse(body).Ratings[0]);
+        console.log(JSON.parse(body).Ratings[1]);
+        console.log(JSON.parse(body).Country);
+        console.log(JSON.parse(body).Language);
+        console.log(JSON.parse(body).Plot);
+        console.log(JSON.parse(body).Actors);
+    } else {
+        console.log("Error occured: " + error);
+    }
+  });
 }
 
 //  Read from random.txt for botomation
@@ -131,7 +137,6 @@ function whatItDo(){
       return console.log(error);
     }
     var dataArray = data.split(",");
-    // var total = 0;
     console.log(dataArray);
     for (key of dataArray){
       console.log(key);
@@ -140,6 +145,8 @@ function whatItDo(){
       }
       console.log(key[0]);
     }
+    //  test calling a function
+    getMovie(movieName);
     console.log("something happend");
-  })
+  });
 }
