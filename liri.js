@@ -132,8 +132,13 @@ function whatItDo(){
     }
     var dataArray = data.split(",");
     // var total = 0;
+    console.log(dataArray);
     for (key of dataArray){
       console.log(key);
+      if (key === "spotify-this-song"){
+        console.log("GOOD"+key);
+      }
+      console.log(key[0]);
     }
     console.log("something happend");
   })
