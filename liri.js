@@ -12,28 +12,32 @@ var command = "";
 var songName = "";
 var movieName = "";
 
-//  in case I need command later for a future feature
+//  condition for command from user input vs do-what-it-says
 if (process.argv[2]) {
   command = process.argv[2];
 }
 
-//  execute command
-switch (command) {
-  case "my-tweets":
-    getTwitter();
-    break;
-  case "spotify-this-song":
-    getSpotify();
-    break;
-  case "movie-this":
-    console.log("movie")
-    getMovie();
-    break;
-  case "do-what-it-says":
-    whatItDo();
-    break;
-  default:
-    console.log("not an option");
+listen();
+
+function listen(){
+  //  execute command
+  switch (command) {
+    case "my-tweets":
+        getTwitter();
+        break;
+    case "spotify-this-song":
+        getSpotify();
+        break;
+    case "movie-this":
+        console.log("movie")
+        getMovie();
+        break;
+    case "do-what-it-says":
+        whatItDo();
+        break;
+    default:
+      console.log("not an option");
+  }
 }
 
 //  get Twitter data
@@ -54,54 +58,59 @@ function getTwitter(){
 //  getSpotify data
 function getSpotify(){
 
-  if (!process.argv[3]){
+  if (!process.argv[3] && !songName){
     songName = "The Sign";
-  } else{
+  } else if (songName !== "") {
+    spotifySearch(songName);
+  } else {
     for (var i = 3; i < process.argv.length; i++){
       songName += " " + process.argv[i];
     }
+    spotifySearch();
   }
 
-  spotify.search({ type: 'track', query: songName.trim() }, function(err, data) {
-    if (err) {
-      return console.log('Error occurred: ' + err);
-    } 
-   
-  var info = data.tracks.items;
-  console.log("********************");
-  // console.log(info[1]);
-  // console.log(info[1].external_urls.spotify);
-   
-  for (item of info){
-    console.log("------------------");
-    console.log("song = " + item.name);
-    // console.log(item);
-    console.log("ALBUM = " + item.album.name);
+  function spotifySearch(){
+    spotify.search({ type: 'track', query: songName.trim() }, function(err, data) {
+        if (err) {
+            return console.log('Error occurred: ' + err);
+        } 
     
-    var artists = item.album.artists;
-    for (artist of artists) {
-      console.log("artist =  " + artist.name);
-    }
-    console.log("url = " + item.external_urls.spotify)
+      var info = data.tracks.items;
+      console.log("********************");
+      // console.log(info[1]);
+      // console.log(info[1].external_urls.spotify);
+        
+      for (item of info){
+        console.log("------------------");
+        console.log("song = " + item.name);
+        // console.log(item);
+        console.log("ALBUM = " + item.album.name);
+
+        var artists = item.album.artists;
+        for (artist of artists) {
+              console.log("artist = " + artist.name);
+        }
+        console.log("url = " + item.external_urls.spotify)
+      }
+
+    });
+
+    // extra track search if more info may be needed using trackID
+    // spotify.request('https://api.spotify.com/v1/tracks/6PGoSes0D9eUDeeAafB2As')
+    // .then(function(data) {
+    //     console.log("HERE IS THE TRACK INFO:")
+    //     console.log(data); 
+    // })
+    // .catch(function(err) {
+    //     console.error('Error occurred: ' + err); 
+    // });
   }
-
-  });
-
-  // extra track search if more info may be needed using trackID
-  // spotify.request('https://api.spotify.com/v1/tracks/6PGoSes0D9eUDeeAafB2As')
-  // .then(function(data) {
-  //   console.log("HERE IS THE TRACK INFO:")
-  //   console.log(data); 
-  // })
-  // .catch(function(err) {
-  //   console.error('Error occurred: ' + err); 
-  // });
 }
 
 //  get Movie data
 function getMovie(){
 
-  if (!process.argv[3]){
+  if (!process.argv[3] && movieName === ""){
     movieName = "Mr. Nobody";
   } else{
     for (var i = 3; i < process.argv.length; i++){
@@ -136,17 +145,29 @@ function whatItDo(){
     if (error){
       return console.log(error);
     }
+    console.log(data.toString());
     var dataArray = data.split(",");
     console.log(dataArray);
+    // console.log(dataArray[0]);
+    // console.log(dataArray[1]);
+    command = dataArray[0];
+    console.log("Here is the command " + command);
+    listen(command);
+    process.argv[3] = dataArray[1];
+    var argument = process.argv[3];
+    console.log("Here is the argument " + argument)
+    songName = argument
+    // getSpotify(songName);
+
+
+    // console.log(JSON.parse(dataArray));
     for (key of dataArray){
       console.log(key);
       if (key === "spotify-this-song"){
-        console.log("GOOD"+key);
+        console.log("getting Spotify for " + argument)
+        getSpotify();
+        
       }
-      console.log(key[0]);
     }
-    //  test calling a function
-    getMovie(movieName);
-    console.log("something happend");
   });
 }
