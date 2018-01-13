@@ -2,6 +2,7 @@ require("dotenv").config();
 var Spotify = require("node-spotify-api");
 var Twitter = require("twitter");
 var request = require("request");
+// var moment = require("moment");
 var keys = require("./keys.js");
 var fs = require("fs");
 
@@ -29,14 +30,14 @@ function listen(){
         getSpotify();
         break;
     case "movie-this":
-        console.log("movie")
         getMovie();
         break;
     case "do-what-it-says":
         whatItDo();
         break;
     default:
-      console.log("not an option");
+      console.log("NOT AN OPTION")
+      console.log("Options are: \n\"my-tweets\" \n\"spotify-this-song\" \n\"movie-this\" \n\"do-what-it-says\"");
   }
 }
 
@@ -46,8 +47,9 @@ function getTwitter(){
   client.get('statuses/user_timeline', params, function(error, tweets, response) {
     if (!error) {
       for (var item of tweets) {
+        console.log("-------------");
         console.log(item.created_at);
-        console.log(item.text);
+        console.log('"' + item.text + '"');
       }
     } else {
       console.log(error);
@@ -59,9 +61,10 @@ function getTwitter(){
 function getSpotify(){
 
   if (!process.argv[3] && !songName){
-    songName = "The Sign";
+    songName = "Ace of Base";
+    spotifySearch();
   } else if (songName !== "") {
-    spotifySearch(songName);
+    spotifySearch();
   } else {
     for (var i = 3; i < process.argv.length; i++){
       songName += " " + process.argv[i];
@@ -76,34 +79,16 @@ function getSpotify(){
         } 
     
       var info = data.tracks.items;
+      var item = info[0];
       console.log("********************");
-      // console.log(info[1]);
-      // console.log(info[1].external_urls.spotify);
-        
-      for (item of info){
-        console.log("------------------");
-        console.log("song = " + item.name);
-        // console.log(item);
-        console.log("ALBUM = " + item.album.name);
-
-        var artists = item.album.artists;
-        for (artist of artists) {
-              console.log("artist = " + artist.name);
-        }
-        console.log("url = " + item.external_urls.spotify)
+      console.log("song = " + item.name);
+      console.log("ALBUM = " + item.album.name);
+      var artists = item.album.artists;
+      for (artist of artists) {
+        console.log("artist = " + artist.name);
       }
-
+      console.log("url = " + item.external_urls.spotify)
     });
-
-    // extra track search if more info may be needed using trackID
-    // spotify.request('https://api.spotify.com/v1/tracks/6PGoSes0D9eUDeeAafB2As')
-    // .then(function(data) {
-    //     console.log("HERE IS THE TRACK INFO:")
-    //     console.log(data); 
-    // })
-    // .catch(function(err) {
-    //     console.error('Error occurred: ' + err); 
-    // });
   }
 }
 
@@ -116,7 +101,7 @@ function getMovie(){
     for (var i = 3; i < process.argv.length; i++){
       movieName += " " + process.argv[i];
     }
-    console.log(movieName.trim());
+    // console.log(movieName.trim());
   }
 
   var queryUrl = "http://www.omdbapi.com/?t=" + movieName.trim() + "&apikey=trilogy";
@@ -124,15 +109,15 @@ function getMovie(){
   request(queryUrl, function(error, response, body) {
 
     if (!error && response.statusCode === 200) {
-        console.log(JSON.parse(body));
-        console.log(JSON.parse(body).Title);
-        console.log(JSON.parse(body).Year);
-        console.log(JSON.parse(body).Ratings[0]);
-        console.log(JSON.parse(body).Ratings[1]);
-        console.log(JSON.parse(body).Country);
-        console.log(JSON.parse(body).Language);
-        console.log(JSON.parse(body).Plot);
-        console.log(JSON.parse(body).Actors);
+        console.log("********************");
+        console.log("Title: " + JSON.parse(body).Title);
+        console.log("Year: " + JSON.parse(body).Year);
+        console.log(JSON.parse(body).Ratings[0].Source +": " + JSON.parse(body).Ratings[0].Value);
+        console.log(JSON.parse(body).Ratings[1].Source +": " + JSON.parse(body).Ratings[1].Value);
+        console.log("Country: " + JSON.parse(body).Country);
+        console.log("Language: " + JSON.parse(body).Language);
+        console.log("Plot: " + JSON.parse(body).Plot);
+        console.log("Actors: " + JSON.parse(body).Actors);
     } else {
         console.log("Error occured: " + error);
     }
@@ -145,29 +130,13 @@ function whatItDo(){
     if (error){
       return console.log(error);
     }
-    console.log(data.toString());
+    // console.log(data.toString());
     var dataArray = data.split(",");
-    console.log(dataArray);
-    // console.log(dataArray[0]);
-    // console.log(dataArray[1]);
+    // console.log(dataArray);
     command = dataArray[0];
-    console.log("Here is the command " + command);
-    listen(command);
-    process.argv[3] = dataArray[1];
-    var argument = process.argv[3];
-    console.log("Here is the argument " + argument)
-    songName = argument
-    // getSpotify(songName);
-
-
-    // console.log(JSON.parse(dataArray));
-    for (key of dataArray){
-      console.log(key);
-      if (key === "spotify-this-song"){
-        console.log("getting Spotify for " + argument)
-        getSpotify();
-        
-      }
-    }
+    // console.log("Here is the command " + command);
+    songName = dataArray[1];
+    // console.log(songName)
+    listen();
   });
 }
