@@ -2,7 +2,6 @@ require("dotenv").config();
 var Spotify = require("node-spotify-api");
 var Twitter = require("twitter");
 var request = require("request");
-// var moment = require("moment");
 var keys = require("./keys.js");
 var fs = require("fs");
 
@@ -104,6 +103,10 @@ function getMovie(){
     // console.log(movieName.trim());
   }
 
+  console.log = function() {
+    fs.appendFile
+  }
+
   var queryUrl = "http://www.omdbapi.com/?t=" + movieName.trim() + "&apikey=trilogy";
 
   request(queryUrl, function(error, response, body) {
@@ -130,13 +133,9 @@ function whatItDo(){
     if (error){
       return console.log(error);
     }
-    // console.log(data.toString());
     var dataArray = data.split(",");
-    // console.log(dataArray);
     command = dataArray[0];
-    // console.log("Here is the command " + command);
     songName = dataArray[1];
-    // console.log(songName)
     listen();
   });
 }
