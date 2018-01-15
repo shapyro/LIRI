@@ -2,8 +2,8 @@
 LIRI - an application to search tweets, songs, and movies
 
 APIs used:
->Twitter
->Spotify
+>Twitter,
+>Spotify,
 >OMDB
 
 
